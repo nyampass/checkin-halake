@@ -10,8 +10,8 @@
     (str id)))
 
 (defn register-user [name phone email]
-  (let [user {:name name, :phone phone, :email email}
-        user-id (unique-id)]
+  (let [user-id (unique-id)
+        user {:id user-id, :name name, :phone phone, :email email}]
     (swap! users assoc user-id user)
     user-id))
 
