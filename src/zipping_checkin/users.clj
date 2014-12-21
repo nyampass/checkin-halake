@@ -9,8 +9,8 @@
     (swap! latest-id inc)
     id))
 
-(defn register-user [name phone-number email]
-  (let [user {:name name, :phone-number phone-number, :email email}
+(defn register-user [name phone email]
+  (let [user {:name name, :phone phone, :email email}
         user-id (unique-id)]
     (swap! users assoc user-id user)
     user-id))
