@@ -1,6 +1,12 @@
-(ns zipping-checkin.core)
+(ns zipping-checkin.core
+  (:require [compojure.core :refer [defroutes GET]]
+            [compojure.route :refer [not-found]]
+            [ring.adapter.jetty :refer [run-jetty]]))
 
-(defn foo
-  "I don't do a whole lot."
-  [x]
-  (println x "Hello, World!"))
+(defroutes app
+  (GET "/" req "Hello, World!")
+  (not-found "NOT FOUND"))
+
+(defn -main []
+  (let [port (Long/parseLong (get (System/getenv) "PORT" "8080"))]
+    (run-jetty app {:port port})))
