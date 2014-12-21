@@ -7,7 +7,7 @@
 (defn unique-id []
   (let [id @latest-id]
     (swap! latest-id inc)
-    id))
+    (str id)))
 
 (defn register-user [name phone email]
   (let [user {:name name, :phone phone, :email email}
