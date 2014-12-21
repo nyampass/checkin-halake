@@ -7,23 +7,23 @@
                              [checkin :as checkin]]))
 
 (defroutes routes
-  (GET "/api/users/register" {{:keys [name phone email]} :params}
+  (GET "/users/register" {{:keys [name phone email]} :params}
     (let [user-id (users/register-user name phone email)]
-      (pr-str (users/query-user user-id))))
-  (GET "/api/users/unregister" {{:keys [user-id]} :params}
+      (str "registered: " name)))
+  (GET "/users/unregister" {{:keys [user-id]} :params}
     (let [user (users/query-user user-id)]
       (users/unregister-user user-id)
       (str "unregistered: " (:name user))))
+  (GET "/checkin/users" req
+    (pr-str (checkin/query-checkin-users)))
   (GET "/api/checkin/checkin" {{:keys [user-id]} :params}
     (let [user (users/query-user user-id)]
       (checkin/checkin user-id)
-      (str "checked in: " (:name user))))
+      (str "{\"type\":\"checkin\", \"status\":\"success\", \"user\":\"" (:name user) "\"}")))
   (GET "/api/checkin/checkout" {{:keys [user-id]} :params}
     (let [user (users/query-user user-id)]
       (checkin/checkout user-id)
-      (str "checked out: " (:name user))))
-  (GET "/api/checkin/users" req
-    (pr-str (checkin/query-checkin-users)))
+      (str "{\"type\":\"checkout\", \"status\":\"success\", \"user\":\"" (:name user) "\"}")))
   (not-found "NOT FOUND"))
 
 (defroutes app
