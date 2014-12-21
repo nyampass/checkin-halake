@@ -4,7 +4,8 @@
             [ring.adapter.jetty :refer [run-jetty]]
             [ring.middleware.defaults :refer [wrap-defaults api-defaults]]
             [zipping-checkin [users :as users]
-                             [checkin :as checkin]]))
+                             [checkin :as checkin]]
+            [clojure.string :as str]))
 
 (defroutes routes
   (GET "/users/register" {{:keys [name phone email]} :params}
@@ -15,13 +16,15 @@
     (let [user (users/query-user user-id)]
       (users/unregister-user user-id)
       (str "unregistered: " (:name user))))
-  (GET "/checkin/users" req
-    (pr-str (checkin/query-checkin-users)))
-  (GET "/api/checkin/checkin" {{:keys [user-id]} :params}
+  (GET "/users/all" req
+    (str/join \newline (users/query-users)))
+  (GET "/users/checkin" req
+    (str/join \newline (checkin/query-checkin-users)))
+  (GET "/api/checkin" {{:keys [user-id]} :params}
     (let [user (users/query-user user-id)]
       (checkin/checkin user-id)
       (str "{\"type\":\"checkin\", \"status\":\"success\", \"user\":\"" (:name user) "\"}")))
-  (GET "/api/checkin/checkout" {{:keys [user-id]} :params}
+  (GET "/api/checkout" {{:keys [user-id]} :params}
     (let [user (users/query-user user-id)]
       (checkin/checkout user-id)
       (str "{\"type\":\"checkout\", \"status\":\"success\", \"user\":\"" (:name user) "\"}")))
