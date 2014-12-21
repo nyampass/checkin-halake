@@ -8,8 +8,9 @@
 
 (defroutes routes
   (GET "/users/register" {{:keys [name phone email]} :params}
-    (let [user-id (users/register-user name phone email)]
-      (str "registered: " name)))
+       (let [user-id (users/register-user name phone email)
+             user (users/query-user user-id)]
+         (str "registered: " user)))
   (GET "/users/unregister" {{:keys [user-id]} :params}
     (let [user (users/query-user user-id)]
       (users/unregister-user user-id)
