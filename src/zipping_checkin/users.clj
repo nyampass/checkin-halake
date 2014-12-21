@@ -21,5 +21,7 @@
 (defn query-user [user-id]
   (get @users user-id))
 
-(defn query-users [user-ids]
-  (select-keys @users user-ids))
+(defn query-users
+  ([] (vals @users))
+  ([user-ids]
+     (vals (select-keys @users user-ids))))
