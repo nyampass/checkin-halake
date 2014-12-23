@@ -1,4 +1,4 @@
-(ns zipping-checkin.users)
+(ns checkin-halake.users)
 
 (def users (atom {}))
 

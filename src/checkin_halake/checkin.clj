@@ -1,5 +1,5 @@
-(ns zipping-checkin.checkin
-  (:require [zipping-checkin.users :as users]))
+(ns checkin-halake.checkin
+  (:require [checkin-halake.users :as users]))
 
 (def checkin-users (atom #{}))
 

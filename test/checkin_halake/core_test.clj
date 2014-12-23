@@ -1,6 +1,6 @@
-(ns zipping-checkin.core-test
+(ns checkin-halake.core-test
   (:require [clojure.test :refer :all]
-            [zipping-checkin.core :refer :all]))
+            [checkin-halake.core :refer :all]))
 
 (deftest a-test
   (testing "FIXME, I fail."

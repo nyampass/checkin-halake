@@ -1,6 +1,6 @@
-(defproject zipping-checkin "0.1.0-SNAPSHOT"
+(defproject checkin-halake "0.1.0-SNAPSHOT"
   :description "FIXME: write description"
-  :url "https://github.com/athos/zipping-checkin"
+  :url "https://github.com/nyampass/checkin-halake"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.6.0"]

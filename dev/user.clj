@@ -2,9 +2,9 @@
   (:require [clojure.tools.namespace.repl :refer [refresh refresh-all]]
             [clojure.repl :refer :all]
             [clojure.pprint :refer [pp pprint]]
-            [zipping-checkin [core :refer :all]
-                             [users :as users]
-                             [checkin :as checkin]]))
+            [checkin-halake [core :refer :all]
+                            [users :as users]
+                            [checkin :as checkin]]))
 
 (reset! users/users
         {"0" {:id "0"

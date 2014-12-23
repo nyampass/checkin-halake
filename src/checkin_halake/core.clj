@@ -1,10 +1,10 @@
-(ns zipping-checkin.core
+(ns checkin-halake.core
   (:require [compojure.core :refer [defroutes GET]]
             [compojure.route :refer [not-found]]
             [ring.adapter.jetty :refer [run-jetty]]
             [ring.middleware.defaults :refer [wrap-defaults api-defaults]]
-            [zipping-checkin [users :as users]
-                             [checkin :as checkin]]
+            [checkin-halake [users :as users]
+                            [checkin :as checkin]]
             [clojure.string :as str]))
 
 (defroutes routes
