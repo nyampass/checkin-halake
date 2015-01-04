@@ -4,7 +4,11 @@ A Clojure library designed to ... well, that part is up to you.
 
 ## Usage
 
-FIXME
+Setup .lein-env file in the project directory
+
+{:twilio-sid "<Twilio Acccount Sid>"
+ :twilio-key "<Twilio Auth Key>"
+ :twilio-from "<Twilio From Tel>"}
 
 ## License
 
