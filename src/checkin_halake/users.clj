@@ -1,27 +1,29 @@
-(ns checkin-halake.users)
+(ns checkin-halake.users
+  (:require [monger.core :as mg]
+            [monger.collection :as mc]
+            [environ.core :refer [env]])
+  (:use [crypto.password.bcrypt :only [encrypt check]]))
 
-(def users (atom {}))
+(defonce db ((mg/connect-via-uri (env :mongodb-uri)) :db))
 
-(def latest-id (atom 0))
+(defn- fix-user [doc]
+  (dissoc doc :password))
 
-(defn unique-id []
-  (let [id @latest-id]
-    (swap! latest-id inc)
-    (str id)))
+(defn register-user [name password phone email]
+  (let [password (encrypt password)
+        user {:_id email, :name name,
+              :phone phone, :password password,
+              :createdAt (java.util.Date.)}]
+    (-> (mc/insert-and-return db "users" user)
+        fix-user)))
 
-(defn register-user [name phone email]
-  (let [user-id (unique-id)
-        user {:id user-id, :name name, :phone phone, :email email}]
-    (swap! users assoc user-id user)
-    user-id))
+(defn login [email password]
+  (let [{crypted-password :password :as user}  (mc/find-one-as-map db "users" {:_id email})]
+    (if (check password crypted-password)
+      (fix-user user))))
 
-(defn unregister-user [user-id]
-  (swap! users dissoc user-id))
+(defn query-users []
+  (map fix-user
+       (mc/find-maps db "users")))
 
-(defn query-user [user-id]
-  (get @users user-id))
-
-(defn query-users
-  ([] (vals @users))
-  ([user-ids]
-     (vals (select-keys @users user-ids))))
+;; (query-users)
