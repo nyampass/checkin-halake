@@ -1,39 +1,57 @@
 (ns checkin-halake.core
-  (:require [compojure.core :refer [defroutes GET]]
+  (:require [compojure.core :refer [defroutes GET POST]]
             [compojure.route :refer [not-found]]
             [ring.adapter.jetty :refer [run-jetty]]
             [ring.middleware.defaults :refer [wrap-defaults api-defaults]]
+            [ring.middleware.reload :refer [wrap-reload]]
             [checkin-halake [users :as users]
-                            [checkin :as checkin]]
-            [clojure.string :as str]))
+             [checkin :as checkin]]
+            [clojure.string :as str]
+            [environ.core :refer [env]]))
 
 (defroutes routes
-  (GET "/users/register" {{:keys [name phone email]} :params}
-       (let [user-id (users/register-user name phone email)
-             user (users/query-user user-id)]
-         (str "registered: " user)))
-  (GET "/users/unregister" {{:keys [user-id]} :params}
-    (let [user (users/query-user user-id)]
-      (users/unregister-user user-id)
-      (str "unregistered: " (:name user))))
-  (GET "/users/all" req
-    (str/join \newline (users/query-users)))
-  (GET "/users/checkin" req
-    (str/join \newline (checkin/query-checkin-users)))
-  (GET "/api/checkin" {{:keys [user-id]} :params}
-    (let [user (users/query-user user-id)]
-      (checkin/checkin user-id)
-      (str "{\"type\":\"checkin\", \"status\":\"success\", \"user\":\"" (:name user) "\"}")))
-  (GET "/api/checkout" {{:keys [user-id]} :params}
-    (let [user (users/query-user user-id)]
-      (checkin/checkout user-id)
-      (str "{\"type\":\"checkout\", \"status\":\"success\", \"user\":\"" (:name user) "\"}")))
-  (not-found "NOT FOUND"))
+  (POST "/api/users" {{:keys [name password phone email]} :params}
+        (let [user (users/register-user name password phone email)]
+          (str "registered: " user)))
+  (GET "/api/users" _
+       (users/query-users))
+  (POST "/api/login" {{:keys [email password]} :params}
+        (users/login email password))
+  (POST "/api/checkin" _
+        (str/join \newline (checkin/query-checkin-users)))
+  (POST "/api/checkin" {{:keys [email password]} :params}
+       (if-let [user (users/login email password)]
+         (do
+           (checkin/checkin (:_id user))
+           (str "{\"type\":\"checkin\", \"status\":\"success\", \"user\":\"" (:name user) "\"}"))))
+  (POST "/api/checkout" {{:keys [email password]} :params}
+       (let [user (users/login email password)]
+         (checkin/checkout (:_id user))
+         (str "{\"type\":\"checkout\", \"status\":\"success\", \"user\":\"" (:name user) "\"}")))
+  (not-found "Not found"))
+
+(defonce headers-key (env :api-request-headers-key))
+
+(defn wrap-auth [app]
+  (fn [{{x-halake-key "x-halake-key"} :headers :as req}]
+    (if (= x-halake-key headers-key)
+      (app req))))
+
+;;    {:a 3}))
+
+;;;    {}(app req)))
 
 (defroutes app
-  (-> routes
+  (-> #'routes
+      wrap-auth
       (wrap-defaults api-defaults)))
 
+(def app-with-reload
+  (ring.middleware.reload/wrap-reload #'app))
+
 (defn -main []
-  (let [port (Long/parseLong (get (System/getenv) "PORT" "8080"))]
-    (run-jetty app {:port port})))
+  (let [port (Long/parseLong (get (System/getenv) "PORT" "8080"))
+        app (if (= (env :ring-reload) "true")
+              #'app
+              #'app-with-reload)]
+    (run-jetty #'app {:port port :join? false})))
