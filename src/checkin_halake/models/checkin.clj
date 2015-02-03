@@ -1,5 +1,6 @@
-(ns checkin-halake.checkin
-  (:require [checkin-halake.users :as users]))
+(ns checkin-halake.models.checkin
+  (:require [checkin-halake.models.users :as users])
+  (:use checkin-halake.models.core))
 
 (def checkin-users (atom #{}))
 

@@ -2,7 +2,8 @@
   (:require [clojure.tools.namespace.repl :refer [refresh refresh-all]]
             [clojure.repl :refer :all]
             [clojure.pprint :refer [pp pprint]]
-            [checkin-halake [core :refer :all]
+            [checkin-halake [core :refer :all]]
+            [checkin-halake.models
                             [users :as users]
                             [checkin :as checkin]]))
 
