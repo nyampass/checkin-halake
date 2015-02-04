@@ -10,10 +10,10 @@
 
 (defn add-ticket-to-user [user ticket-type count]
   (let [ticket-key (str "tickets." ticket-type)]
-    (mc/update db "users" {:_id (:id user)} {mo/$inc {ticket-key count}})))
+    (mc/update db "users" {:_id (:_id user)} {mo/$inc {ticket-key count}})))
 
 (defn use-ticket [user ticket-type]
   (let [ticket-key (str "tickets." ticket-type)]
-    (mc/update db "users" {:_id (:id user) mo/$gt {ticket-type 0}} {mo/$inc {ticket-key -1}})))
+    (mc/update db "users" {:_id (:_id user) ticket-key {mo/$gt 0}} {mo/$inc {ticket-key -1}})))
 
   
