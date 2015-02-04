@@ -15,6 +15,6 @@
 ;; (register-event "Swift開発講座" "/images/evnets/inside_halake.png" (java.util.Date ) "taro@email.com" "hoge" "Taro" "090")
 
 (defn query-events []
-  (map (mc/find-maps db "events")))
+  (mc/find-maps db "events"))
 
 ;; (query-events)
