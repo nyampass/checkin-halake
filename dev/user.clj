@@ -4,18 +4,31 @@
             [clojure.pprint :refer [pp pprint]]
             [checkin-halake [core :refer :all]]
             [checkin-halake.models
-                            [users :as users]
-                            [checkin :as checkin]]))
+             [users :as users]
+             [checkin :as checkin]]
+            [ring.server.standalone :refer [serve]]
+            [ring.middleware
+             [file :refer [wrap-file]]
+             [file-info :refer [wrap-file-info]]]))
 
-(comment
-  (reset! users/users
-          {"0" {:id "0"
-                :name "sohta"
-                :phone "0112223333"
-                :password "hoge"
-                :email "shogo@nyampass.com"}
-           "1" {:id "1"
-                :name "tnobo"
-                :phone "01234578"
-                :password "pass"
-                :email "tokusei@nyampass.com"}}))
+(defonce server (atom nil))
+
+(defn get-handler []
+  (-> #'app
+      (wrap-file "resources")
+      (wrap-file-info)))
+
+(defn start-server
+  "used for starting the server in development mode from REPL"
+  [& [port]]
+  (let [port (if port (Integer/parseInt port) 3000)]
+    (reset! server
+            (serve (get-handler)
+                   {:port port
+                    :auto-reload? true
+                    :join? false}))
+    (println (str "You can view the site at http://localhost:" port))))
+
+(defn stop-server []
+  (.stop @server)
+  (reset! server nil))
