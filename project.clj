@@ -23,4 +23,4 @@
                    :source-paths ["dev"]
                    :env {:dev true
                          :mongodb-uri "mongodb://localhost/checkin-halake"
-                         :api-headers-key "checkin-halake-api"}}})
+                         :api-request-headers-key "checkin-halake-api"}}})
