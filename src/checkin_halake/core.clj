@@ -65,7 +65,7 @@
       (wrap-defaults api-defaults)))
 
 (def app (-> (routes
-              (GET "/")
+              (GET "/" _)
               (context "/api" _
                        api-routes))
              wrap-log))
