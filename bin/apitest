@@ -1,0 +1,30 @@
+#!/bin/bash
+
+if [ $# -lt 2 ]; then
+  echo "usage: $(basename $0) method path [post-data]" >&2
+  exit 1
+fi
+
+method=$1
+path=$2
+
+host=${CHECKIN_HALAKE_HOST:-'localhost:3000'}
+
+if [ $method = post -o $method = POST ]
+then
+  data=$3
+  opts=--post-data=$data
+fi
+
+api_key=${API_REQUEST_HEADERS_KEY:-checkin-halake-api}
+api_header="X-HaLake-Key: $api_key"
+
+url=http://$host/api/$path
+
+echo $method $url ... >&2
+if [ $method = post -o $method = POST ]
+then
+  echo sending data [$data] >&2
+fi
+echo >&2
+echo $(wget --header="$api_header" $opts -O - $url 2> /dev/null)
