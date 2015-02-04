@@ -1,18 +1,24 @@
 (ns checkin-halake.models.users
   (:require [monger.core :as mg]
             [monger.collection :as mc]
-            [environ.core :refer [env]])
+            [environ.core :refer [env]]
+            [checkin-halake.models.ticket :as ticket])
   (:use [crypto.password.bcrypt :only [encrypt check]]
         checkin-halake.models.core))
 
 (defn- fix-user [doc]
   (dissoc doc :password))
 
+(def initial-tickets
+  (zipmap (keys ticket/ticket-types)
+          (repeat 0)))
+
 (defn register-user [email password name phone]
   (let [password (encrypt password)
         user {:_id email, :name name,
               :phone phone, :password password,
-              :createdAt (java.util.Date.)}]
+              :createdAt (java.util.Date.)
+              :tickets initial-tickets}]
     (-> (mc/insert-and-return db "users" user)
         fix-user)))
 
