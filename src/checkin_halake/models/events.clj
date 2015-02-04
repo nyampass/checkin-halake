@@ -1,8 +1,7 @@
 (ns checkin-halake.models.events
   (:require [monger.collection :as mc]
             [environ.core :refer [env]])
-  (:use checkin-halake.core
-        checkin-halake.models.core))
+  (:use checkin-halake.models.core))
 
 (defn- fix-event [doc]
   (dissoc doc :password))
