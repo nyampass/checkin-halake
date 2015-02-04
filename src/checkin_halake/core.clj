@@ -33,15 +33,15 @@
   (POST "/checkin" {{:keys [email password]} :params}
        (let [user (users/login email password)]
          (if (and user (checkin/checkin (:_id user)))
-           (response-with-status :user user)
+           (response-with-status true :user user)
            (response-with-status false :reason "Email/Password combination is not valid"))))
   (POST "/checkout" {{:keys [email password]} :params}
        (let [user (users/login email password)]
          (if (and user (checkin/checkout (:_id user)))
-           (response-with-status :user user)
+           (response-with-status true :user user)
            (response-with-status false :reason "Email/Password combination is not valid"))))
   (GET "/events" _
-       response-with-status :evnets (events/query-events)))
+       (response-with-status true :events (events/query-events))))
 ;;  (not-found "Not found"))
 
 (defonce headers-key (env :api-request-headers-key))
