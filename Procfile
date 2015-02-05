@@ -1,1 +1,1 @@
-web: lein ring server
+web: lein run -m checkin-halake.core
