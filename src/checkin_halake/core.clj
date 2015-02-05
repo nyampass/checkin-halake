@@ -9,6 +9,7 @@
             [ring.util.response :refer [response]]
             [checkin-halake.models
              [users :as users]
+             [admin :as admin]
              [ticket :as ticket]
              [events :as events]
              [checkin :as checkin]]
@@ -26,6 +27,16 @@
           (response-with-status (boolean user) :user user)))
   (GET "/users" _
        (response-with-status true :users (users/query-users)))
+  (POST "/users/:id/tickets/:type" {{:keys [id type email password count]} :params}
+        (if-let [admin (admin/login email password)]
+          (let [type (keyword type)
+                user (users/find-user id)
+                count (Long/parseLong count)]
+            (when (and user (contains? ticket/ticket-types type))
+              (ticket/add-ticket-to-user user type count)
+              (let [tickets (ticket/available-tickets user)]
+                (response-with-status true :tickets tickets))))
+          (response-with-status false :reason "Email/Password combination is not valid")))
   (PUT "/users/me/tickets/:type" {{:keys [type used email password]} :params}
        (let [type (keyword type)]
          (when (contains? ticket/ticket-types type)

@@ -11,11 +11,14 @@
 (defn register-admin [email password name]
   (let [password (encrypt password)
         admin {:_id email, :password password, :name name}]
-    (-> (mc/insert-and-return db "admin" admin)
+    (-> (mc/insert-and-return db "admins" admin)
         fix-admin)))
 
 (defn login [email password]
   (assert (and (seq email) (seq password)))
-  (let [{crypted-password :password :as admin} (mc/find-one-as-map db "admin" {:_id email})]
+  (let [{crypted-password :password :as admin} (mc/find-one-as-map db "admins" {:_id email})]
     (when (check password crypted-password)
       (fix-admin admin))))
+
+(defn query-admins []
+  (map fix-admin (mc/find-maps db "admins")))
