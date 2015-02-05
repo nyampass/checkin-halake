@@ -9,6 +9,7 @@
             [ring.util.response :refer [response]]
             [checkin-halake.models
              [users :as users]
+             [ticket :as ticket]
              [events :as events]
              [checkin :as checkin]]
             [clojure.string :as str]
@@ -28,7 +29,8 @@
   (POST "/login" {{:keys [email password]} :params :as req}
         (prn :login email password req)
         (if-let [user (users/login email password)]
-          (response-with-status true :user user)
+          (let [tickets (ticket/available-tickets user)]
+            (response-with-status true :user (assoc user :tickets tickets)))
           (response-with-status false :reason "Email/Password combination is not valid")))
   (POST "/checkin" {{:keys [email password]} :params}
        (let [user (users/login email password)]

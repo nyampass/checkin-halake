@@ -16,4 +16,11 @@
   (let [ticket-key (str "tickets." ticket-type)]
     (mc/update db "users" {:_id (:_id user) ticket-key {mo/$gt 0}} {mo/$inc {ticket-key -1}})))
 
-  
+(defn available-tickets [user]
+  (let [tickets (:tickets (mc/find-one-as-map db "users" {:_id (:_id user)}))]
+    (reduce (fn [m type]
+              (if (> (tickets type) 0)
+                m
+                (dissoc m type)))
+            tickets
+            (keys tickets))))
