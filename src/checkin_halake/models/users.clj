@@ -13,6 +13,9 @@
   (zipmap (keys ticket/ticket-types)
           (repeat 0)))
 
+(defn find-user [id]
+  (fix-user (mc/find-one-as-map db "users" {:_id id})))
+
 (defn register-user [email password name phone]
   (let [password (encrypt password)
         user {:_id email, :name name,
