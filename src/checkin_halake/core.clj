@@ -1,70 +1,18 @@
 (ns checkin-halake.core
   (:require [compojure.core :refer [defroutes routes context GET POST PUT]]
-            [compojure.route :refer [not-found files]]
             [ring.adapter.jetty :refer [run-jetty]]
             [ring.middleware.defaults :refer [wrap-defaults api-defaults]]
             [ring.middleware.reload :refer [wrap-reload]]
             [ring.middleware.json :refer [wrap-json-response]]
-            [ring.middleware.resource :refer [wrap-resource]]
-            [ring.util.response :refer [response]]
-            [checkin-halake.models
+            [checkin-halake.routes
              [users :as users]
-             [admin :as admin]
-             [ticket :as ticket]
-             [events :as events]
-             [checkin :as checkin]]
-            [clojure.string :as str]
+             [admin :as admin]]
+            [checkin-halake.util :as util]
             [environ.core :refer [env]]))
 
-(defn- response-with-status [success? & {:as body}]
-  (-> (merge {:status (if success? "success" "failure")}
-             body)
-      response ))
- 
 (defroutes api-routes*
-  (POST "/users" {{:keys [name password phone email]} :params}
-        (let [user (users/register-user email password name phone)]
-          (response-with-status (boolean user) :user user)))
-  (GET "/users" _
-       (response-with-status true :users (users/query-users)))
-  (POST "/users/:id/tickets/:type" {{:keys [id type email password count]} :params}
-        (if-let [admin (admin/login email password)]
-          (let [type (keyword type)
-                user (users/find-user id)
-                count (Long/parseLong count)]
-            (when (and user (contains? ticket/ticket-types type))
-              (ticket/add-ticket-to-user user type count)
-              (let [tickets (ticket/available-tickets user)]
-                (response-with-status true :tickets tickets))))
-          (response-with-status false :reason "Email/Password combination is not valid")))
-  (PUT "/users/me/tickets/:type" {{:keys [type used email password]} :params}
-       (let [type (keyword type)]
-         (when (contains? ticket/ticket-types type)
-           (if-let [user (users/login email password)]
-             (if (ticket/use-ticket user type)
-               (let [tickets (ticket/available-tickets user)]
-                 (response-with-status true :tickets tickets))
-               (response-with-status false :reason "No available tickets"))
-             (response-with-status false :reason "Email/Password combination is not valid")))))
-  (POST "/login" {{:keys [email password]} :params :as req}
-        (prn :login email password req)
-        (if-let [user (users/login email password)]
-          (let [tickets (ticket/available-tickets user)]
-            (response-with-status true :user (assoc user :tickets tickets)))
-          (response-with-status false :reason "Email/Password combination is not valid")))
-  (POST "/checkin" {{:keys [email password]} :params}
-       (let [user (users/login email password)]
-         (if (and user (checkin/checkin (:_id user)))
-           (response-with-status true :user user)
-           (response-with-status false :reason "Email/Password combination is not valid"))))
-  (POST "/checkout" {{:keys [email password]} :params}
-       (let [user (users/login email password)]
-         (if (and user (checkin/checkout (:_id user)))
-           (response-with-status true :user user)
-           (response-with-status false :reason "Email/Password combination is not valid"))))
-  (GET "/events" _
-       (response-with-status true :events (events/query-events))))
-;;  (not-found "Not found"))
+  #'users/users-routes
+  #'admin/admin-routes)
 
 (defonce headers-key (env :api-request-headers-key))
 
@@ -72,7 +20,7 @@
   (fn [{{x-halake-key "x-halake-key"} :headers :as req}]
     (if (= x-halake-key headers-key)
       (app req)
-      (response-with-status false :reason "Not authorized"))))
+      (util/response-with-status false :reason "Not authorized"))))
 
 (defn wrap-log [app]
   (fn [req]
