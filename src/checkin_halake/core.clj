@@ -1,5 +1,5 @@
 (ns checkin-halake.core
-  (:require [compojure.core :refer [defroutes routes context GET POST]]
+  (:require [compojure.core :refer [defroutes routes context GET POST PUT]]
             [compojure.route :refer [not-found files]]
             [ring.adapter.jetty :refer [run-jetty]]
             [ring.middleware.defaults :refer [wrap-defaults api-defaults]]
@@ -26,6 +26,15 @@
           (response-with-status (boolean user) :user user)))
   (GET "/users" _
        (response-with-status true :users (users/query-users)))
+  (PUT "/users/me/tickets/:type" {{:keys [type used email password]} :params}
+       (let [type (keyword type)]
+         (when (contains? ticket/ticket-types type)
+           (if-let [user (users/login email password)]
+             (if (ticket/use-ticket user type)
+               (let [tickets (ticket/available-tickets user)]
+                 (response-with-status true :tickets tickets))
+               (response-with-status false :reason "No available tickets"))
+             (response-with-status false :reason "Email/Password combination is not valid")))))
   (POST "/login" {{:keys [email password]} :params :as req}
         (prn :login email password req)
         (if-let [user (users/login email password)]
