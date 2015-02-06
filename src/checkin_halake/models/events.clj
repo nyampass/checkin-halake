@@ -1,7 +1,6 @@
 (ns checkin-halake.models.events
   (:require [monger.collection :as mc]
-            [environ.core :refer [env]])
-  (:use checkin-halake.models.core))
+            [checkin-halake.models.core :refer [db]]))
 
 (defn- fix-event [event]
   (-> event
