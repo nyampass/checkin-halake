@@ -10,12 +10,13 @@
              [checkin :as checkin]]
             [clj-time
              [format :as format]
-             [local :as local]]))
+             [local :as local]
+             [coerce :as coerce]]))
 
 (def format (format/formatter "yyyy-MM-dd HH:mm"))
 
 (defn- str->datetime [s]
-  (local/to-local-date-time (format/parse format s)))
+  (coerce/to-date (local/to-local-date-time (format/parse format s))))
 
 (defroutes ^:private admin-routes*
   (POST "/users" {{:keys [name password phone email]} :params}
