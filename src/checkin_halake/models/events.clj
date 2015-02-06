@@ -1,6 +1,9 @@
 (ns checkin-halake.models.events
   (:require [monger.collection :as mc]
-            [checkin-halake.models.core :refer [db]]))
+            [monger.result :as mr]
+            [checkin-halake.models.core :refer [db]])
+  (:import org.bson.types.ObjectId
+           com.mongodb.WriteResult))
 
 (defn- fix-event [event]
   (-> event
@@ -14,6 +17,10 @@
     (fix-event (mc/insert-and-return db "events" event))))
 
 ;; (register-event "Swift開発講座" "/images/evnets/inside_halake.png" (java.util.Date ) "taro@email.com" "hoge" "Taro" "090")
+
+(defn remove-event [id]
+  (let [^WriteResult result (mc/remove-by-id db "events" (ObjectId. id))]
+    (not= (.getN result) 0)))
 
 (defn query-events []
   (map fix-event (mc/find-maps db "events")))

@@ -1,6 +1,6 @@
 (ns checkin-halake.routes.admin
   (:refer-clojure :exclude [format])
-  (:require [compojure.core :refer [defroutes GET POST PUT]]
+  (:require [compojure.core :refer [defroutes GET POST PUT DELETE]]
             [checkin-halake.util :as util]
             [checkin-halake.models
              [users :as users]
@@ -37,7 +37,14 @@
                                (catch IllegalArgumentException _ nil))]
           (let [event (events/register-event title image-url event-at content-url)]
             (util/response-with-status true :event event))
-          (util/response-with-status false :reason "Wrong datetime format"))))
+          (util/response-with-status false :reason "Wrong datetime format")))
+  (DELETE "/events/:id" {{:keys [id]} :params}
+          (try
+            (if (events/remove-event id)
+              (util/response-with-status true)
+              (util/response-with-status false :reason "No such events"))
+            (catch IllegalArgumentException _
+              (util/response-with-status false :reason "No such events")))))
 
 (defn- wrap-check-admin [app]
   (fn [{{:keys [user]} :params :as req}]
