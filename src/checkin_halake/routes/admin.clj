@@ -39,7 +39,7 @@
           (util/response-with-status false :reason "Wrong datetime format"))))
 
 (defn- wrap-check-admin [app]
-  (fn [{:keys [user] :as req}]
+  (fn [{{:keys [user]} :params :as req}]
     (if (:admin? user)
       (app req)
       (util/response-with-status false :reason "Not admin user"))))
