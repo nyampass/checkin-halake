@@ -25,9 +25,12 @@
 
 (defn wrap-authenticate [app]
   (fn [{{:keys [email password]} :params :as req}]
-    (if-let [user (users/login email password)]
-      (app (assoc-in req [:params :user] user))
-      (util/response-with-status false :reason "Email/Password combination is not valid"))))
+    (if (and (= (:uri req) "/api/users")
+             (= (:request-method req) :post))
+      (app req)
+      (if-let [user (users/login email password)]
+        (app (assoc-in req [:params :user] user))
+        (util/response-with-status false :reason "Email/Password combination is not valid")))))
 
 (defn wrap-log [app]
   (fn [req]
