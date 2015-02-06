@@ -20,7 +20,7 @@
   (let [password (encrypt password)
         user {:_id email, :name name,
               :phone phone, :password password,
-              :createdAt (java.util.Date.)
+              :created-at (java.util.Date.)
               :tickets initial-tickets}]
     (-> (mc/insert-and-return db "users" user)
         fix-user)))
