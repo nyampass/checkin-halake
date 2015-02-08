@@ -1,1 +1,1 @@
-web: lein run -m checkin-halake.core
+web: lein with-profile production trampoline run -m checkin-halake.core
