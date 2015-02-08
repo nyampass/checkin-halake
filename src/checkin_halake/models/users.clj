@@ -1,13 +1,17 @@
 (ns checkin-halake.models.users
   (:require [monger.core :as mg]
             [monger.collection :as mc]
+            [monger.operators :as mo]
             [environ.core :refer [env]]
             [checkin-halake.models.ticket :as ticket])
   (:use [crypto.password.bcrypt :only [encrypt check]]
         checkin-halake.models.core))
 
+(def user-statuses #{:member :dropin})
+
 (defn- fix-user [doc]
-  (dissoc doc :password))
+  (-> (dissoc doc :password)
+      (update-in [:status] (fnil keyword :dropin))))
 
 (def initial-tickets
   (zipmap (keys ticket/ticket-types)
@@ -40,3 +44,7 @@
        (mc/find-maps db "users")))
 
 ;; (query-users)
+
+(defn set-user-status [user status]
+  (assert (contains? user-statuses status))
+  (boolean (mc/update db "users" {:_id (:_id user)} {mo/$set {:status status}})))
