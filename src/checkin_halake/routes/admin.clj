@@ -32,6 +32,12 @@
             (ticket/add-ticket-to-user user type count)
             (let [tickets (ticket/available-tickets user)]
               (util/response-with-status true :tickets tickets)))))
+  (PUT "/users/:id/status/:status" {{:keys [id status]} :params}
+       (let [status (keyword status)
+             user (users/find-user id)]
+         (when (and user (contains? users/user-statuses status))
+           (users/set-user-status user status)
+           (util/response-with-status true))))
   (POST "/events" {{:keys [title image-url event-at content-url]} :params}
         (if-let [event-at (try (str->datetime event-at)
                                (catch IllegalArgumentException _ nil))]
