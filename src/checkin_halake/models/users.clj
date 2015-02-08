@@ -3,9 +3,9 @@
             [monger.collection :as mc]
             [monger.operators :as mo]
             [environ.core :refer [env]]
-            [checkin-halake.models.ticket :as ticket])
-  (:use [crypto.password.bcrypt :only [encrypt check]]
-        checkin-halake.models.core))
+            [crypto.password.bcrypt :refer [encrypt check]]
+            [checkin-halake.models.core :refer [db]]
+            [checkin-halake.models.ticket :as ticket]))
 
 (def user-statuses #{:member :dropin})
 
