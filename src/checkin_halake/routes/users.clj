@@ -17,7 +17,7 @@
            (if (ticket/use-ticket user type)
                (let [tickets (ticket/available-tickets user)]
                  (util/response-with-status true :tickets tickets))
-               (util/response-with-status false :reason "No available tickets")))))
+               (util/response-with-status false :reason "利用可能なチケットがありません")))))
   (POST "/login" {{:keys [user]} :params :as req}
         (let [tickets (ticket/available-tickets user)]
           (util/response-with-status true :user (assoc user :tickets tickets))))

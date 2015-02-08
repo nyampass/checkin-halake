@@ -21,7 +21,7 @@
   (fn [{{x-halake-key "x-halake-key"} :headers :as req}]
     (if (= x-halake-key headers-key)
       (app req)
-      (util/response-with-status false :reason "Not authorized"))))
+      (util/response-with-status false :reason "正規のアプリケーションではありません"))))
 
 (defn wrap-authenticate [app]
   (fn [{{:keys [email password]} :params :as req}]
@@ -30,7 +30,7 @@
       (app req)
       (if-let [user (users/login email password)]
         (app (assoc-in req [:params :user] user))
-        (util/response-with-status false :reason "Email/Password combination is not valid")))))
+        (util/response-with-status false :reason "メールアドレスかパスワードのいずれかに誤りがあります")))))
 
 (defn wrap-log [app]
   (fn [req]

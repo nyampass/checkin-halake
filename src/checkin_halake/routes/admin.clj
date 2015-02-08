@@ -43,20 +43,20 @@
                                (catch IllegalArgumentException _ nil))]
           (let [event (events/register-event title image-url event-at content-url)]
             (util/response-with-status true :event event))
-          (util/response-with-status false :reason "Wrong datetime format")))
+          (util/response-with-status false :reason "日付フォーマットに誤りがあります")))
   (DELETE "/events/:id" {{:keys [id]} :params}
           (try
             (if (events/remove-event id)
               (util/response-with-status true)
-              (util/response-with-status false :reason "No such events"))
+              (util/response-with-status false :reason "該当するイベントがありません"))
             (catch IllegalArgumentException _
-              (util/response-with-status false :reason "No such events")))))
+              (util/response-with-status false :reason "該当するイベントがありません")))))
 
 (defn- wrap-check-admin [app]
   (fn [{{:keys [user]} :params :as req}]
     (if (:admin? user)
       (app req)
-      (util/response-with-status false :reason "Not admin user"))))
+      (util/response-with-status false :reason "管理者権限がありません"))))
 
 (def admin-routes
   (-> #'admin-routes*
