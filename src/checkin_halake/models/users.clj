@@ -11,7 +11,8 @@
 
 (defn- fix-user [doc]
   (-> (dissoc doc :password)
-      (update-in [:status] (fnil keyword :dropin))))
+      (some-> identity
+              (update-in [:status] (fnil keyword :dropin)))))
 
 (def initial-tickets
   (zipmap (keys ticket/ticket-types)
