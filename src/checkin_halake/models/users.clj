@@ -49,3 +49,10 @@
 (defn set-user-status [user status]
   (assert (contains? user-statuses status))
   (boolean (mc/update db "users" {:_id (:_id user)} {mo/$set {:status status}})))
+
+(defn update-user-profile [user name phone]
+  (if (or (seq name) (seq phone))
+    (let [updates (-> {}
+                      (cond-> (seq name) (assoc :name name))
+                      (cond-> (seq phone) (assoc :phone phone)))]
+    (boolean (mc/update db "users" {:_id (:_id user)} {mo/$set updates})))))
