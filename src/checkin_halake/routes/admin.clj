@@ -11,12 +11,23 @@
             [clj-time
              [format :as format]
              [local :as local]
-             [coerce :as coerce]]))
+             [coerce :as coerce]]
+            [taoensso.timbre :as timbre]))
 
 (def format (format/formatter "yyyy-MM-dd HH:mm"))
 
 (defn- str->datetime [s]
   (coerce/to-date (local/to-local-date-time (format/parse format s))))
+
+(defn notify-event [{:keys [title] :as event}]
+  (try
+    (let [conn (util/connect-to-push-service)]
+      (doseq [user (users/query-users)]
+        (when-let [token (get-in user [:tokens :apns])]
+          (let [message (str "新しいイベント「" title "」が登録されました")]
+            (util/notify conn token message)))))
+    (catch Exception e
+      (timbre/error e))))
 
 (defroutes ^:private admin-routes*
   (POST "/users" {{:keys [name password phone email]} :params}
@@ -42,6 +53,7 @@
         (if-let [event-at (try (str->datetime event-at)
                                (catch IllegalArgumentException _ nil))]
           (let [event (events/register-event title image-url event-at content-url)]
+            (notify-event event)
             (util/response-with-status true :event event))
           (util/response-with-status false :reason "日付フォーマットに誤りがあります")))
   (DELETE "/events/:id" {{:keys [id]} :params}

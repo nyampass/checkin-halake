@@ -17,7 +17,8 @@
                  [crypto-password "0.1.3"]
                  [environ "1.0.0"]
                  [clj-time "0.9.0"]
-                 [herolabs/apns "0.5.0"]]
+                 [herolabs/apns "0.5.0"]
+                 [com.taoensso/timbre "3.3.1"]]
   :plugins [[lein-ring "0.9.0"]
             [lein-environ "1.0.0"]]
   :ring {:handler checkin-halake.core/app}
