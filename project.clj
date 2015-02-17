@@ -16,7 +16,8 @@
                  [com.novemberain/monger "2.0.1"]
                  [crypto-password "0.1.3"]
                  [environ "1.0.0"]
-                 [clj-time "0.9.0"]]
+                 [clj-time "0.9.0"]
+                 [herolabs/apns "0.5.0"]]
   :plugins [[lein-ring "0.9.0"]
             [lein-environ "1.0.0"]]
   :ring {:handler checkin-halake.core/app}

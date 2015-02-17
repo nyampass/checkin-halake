@@ -19,10 +19,13 @@
                  (util/response-with-status true :tickets tickets))
                (util/response-with-status false :reason "利用可能なチケットがありません")))))
   (PUT "/users/me" {{:keys [name phone user]} :params}
-       (let [response (users/update-user-profile user name phone)]
-         (if (users/update-user-profile user name phone)
-           (util/response-with-status true)
-           (util/response-with-status false :reason "変更に失敗しました"))))
+       (if (users/update-user-profile user name phone)
+         (util/response-with-status true)
+         (util/response-with-status false :reason "変更に失敗しました")))
+  (PUT "/users/me/tokens" {{:keys [user key value]} :params}
+       (if (users/update-user-token user (keyword key) value)
+         (util/response-with-status true)
+         (util/response-with-status false :reason "変更に失敗しました")))
   (POST "/login" {{:keys [user]} :params :as req}
         (let [tickets (ticket/available-tickets user)]
           (util/response-with-status true :user (assoc user :tickets tickets))))

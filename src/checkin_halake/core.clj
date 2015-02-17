@@ -19,6 +19,7 @@
 
 (defn wrap-api-authorized [app]
   (fn [{{x-halake-key "x-halake-key"} :headers :as req}]
+    (prn req x-halake-key)
     (if (= x-halake-key headers-key)
       (app req)
       (util/response-with-status false :reason "正規のアプリケーションではありません"))))

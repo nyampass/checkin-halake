@@ -9,6 +9,8 @@
 
 (def user-statuses #{:member :dropin})
 
+(def user-token-keys #{:apns})
+
 (defn- fix-user [doc]
   (-> (dissoc doc :password)
       (some-> identity
@@ -30,21 +32,15 @@
     (-> (mc/insert-and-return db "users" user)
         fix-user)))
 
-;; (register-user "taro@email.com" "hoge" "Taro" "090")
-
 (defn login [email password]
   (and (seq email) (seq password)
        (let [{crypted-password :password :as user}  (mc/find-one-as-map db "users" {:_id email})]
          (if (check password crypted-password)
            (fix-user user)))))
 
-;; (login "taro@email.com" "hoge")
-
 (defn query-users []
   (map fix-user
        (mc/find-maps db "users")))
-
-;; (query-users)
 
 (defn set-user-status [user status]
   (assert (contains? user-statuses status))
@@ -56,3 +52,9 @@
                       (cond-> (seq name) (assoc :name name))
                       (cond-> (seq phone) (assoc :phone phone)))]
     (boolean (mc/update db "users" {:_id (:_id user)} {mo/$set updates})))))
+
+(defn update-user-token [user key value]
+  (assert (contains? user-token-keys key))
+  (if (seq value)
+    (let [key' (str "tokens." (name key))]
+      (boolean (mc/update db "users" {:_id (:_id user)} {mo/$set {key' value}})))))
