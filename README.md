@@ -10,8 +10,10 @@ Setup .lein-env file in the project directory
  :twilio-key "<Twilio Auth Key>"
  :twilio-from "<Twilio From Tel>"}
 
+If you want to make push notifications available, put the generated *.p12/*.cer files into the directory `resources/private` and configure the environment variable `$HALAKE_SSL_KEY_PASS`.
+
 ## License
 
-Copyright © 2014 Nyampass Co. Ltd.
+Copyright © 2014-2015 Nyampass Co. Ltd.
 
 Distributed under the Eclipse Public License version 1.0.
